@@ -123,13 +123,13 @@ def cleaner(df):
     return df
 
 
-def writer(df, info='noinfo'):
+def writer(df, info='noinfo', mypath=''):
     # get time today in format YYYY:MM:DD HH:MM:SS
     today = str(datetime.now()).rsplit(".")[0]
     # define file name
-    filename = "/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/Project/scraped/meteotest_" + info + '_' + \
+    filename = mypath + "scraped/meteotest_" + info + '_' + \
                today.rsplit(' ')[0] + ".csv"
-    filename_combined = "/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/Project/scraped/meteotest_combined_" \
+    filename_combined = mypath + "scraped/meteotest_combined_" \
                         + info + ".csv"
     # write data with pandas
     df.to_csv(filename, header=True, index=False)
@@ -142,7 +142,7 @@ def writer(df, info='noinfo'):
 while True:
     if (datetime.now().hour == 11) and (datetime.now().minute == 0):
         df_dirty = scraper()
-        writer(df_dirty, 'dirty')
+        writer(df_dirty, info='dirty', mypath='/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/cip02-weather/')
         df_clean = cleaner(df_dirty)
-        writer(df_clean, 'clean')
+        writer(df_clean, info='clean', mypath='/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/cip02-weather/')
     time.sleep(30)

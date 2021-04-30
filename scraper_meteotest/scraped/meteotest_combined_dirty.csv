@@ -1,0 +1,151 @@
+date_forecast,date_scraped,location,precipitation_mm,precipitation_percent,temp_max_celsius,temp_min_celsius,weather_forecast,website_scraped
+2021-04-25,2021-04-25 15:19:42,Bern,0,5,20,5,schön,meteotest
+2021-04-26,2021-04-25 15:19:42,Bern,0,5,16,5,schön,meteotest
+2021-04-27,2021-04-25 15:19:42,Bern,0,5,15,5,leicht bewölkt,meteotest
+2021-04-28,2021-04-25 15:19:42,Bern,6,30,15,7,Regenschauer,meteotest
+2021-04-29,2021-04-25 15:19:43,Bern,23,60,14,8,Regenschauer,meteotest
+2021-04-25,2021-04-25 15:19:50,Zuerich,0,5,20,5,schön,meteotest
+2021-04-26,2021-04-25 15:19:50,Zuerich,0,5,16,5,schön,meteotest
+2021-04-27,2021-04-25 15:19:50,Zuerich,0,5,15,5,leicht bewölkt,meteotest
+2021-04-28,2021-04-25 15:19:50,Zuerich,6,30,15,7,Regenschauer,meteotest
+2021-04-29,2021-04-25 15:19:50,Zuerich,23,60,14,8,Regenschauer,meteotest
+2021-04-25,2021-04-25 15:19:59,Luzern,0,30,19,7,leicht bewölkt,meteotest
+2021-04-26,2021-04-25 15:19:59,Luzern,0,5,16,6,schön,meteotest
+2021-04-27,2021-04-25 15:19:59,Luzern,0,30,16,6,leicht bewölkt,meteotest
+2021-04-28,2021-04-25 15:19:59,Luzern,3,40,16,8,Regenschauer,meteotest
+2021-04-29,2021-04-25 15:19:59,Luzern,12,60,15,9,Regenschauer,meteotest
+2021-04-25,2021-04-25 15:20:10,Fribourg,0,5,19,6,leicht bewölkt,meteotest
+2021-04-26,2021-04-25 15:20:10,Fribourg,0,5,15,6,schön,meteotest
+2021-04-27,2021-04-25 15:20:10,Fribourg,0,5,14,5,leicht bewölkt,meteotest
+2021-04-28,2021-04-25 15:20:10,Fribourg,7,30,14,7,Regenschauer,meteotest
+2021-04-29,2021-04-25 15:20:10,Fribourg,14,70,12,8,Regenschauer,meteotest
+2021-04-25,2021-04-25 15:20:17,Jungfraujoch,0,5,-4,-9,schön,meteotest
+2021-04-26,2021-04-25 15:20:17,Jungfraujoch,0,5,-2,-7,schön,meteotest
+2021-04-27,2021-04-25 15:20:17,Jungfraujoch,1,5,-4,-8,leicht bewölkt,meteotest
+2021-04-28,2021-04-25 15:20:17,Jungfraujoch,2,50,-4,-8,Schneeschauer,meteotest
+2021-04-29,2021-04-25 15:20:17,Jungfraujoch,12,80,-6,-8,Schneefall,meteotest
+2021-04-26,2021-04-26 11:01:27,Bern,0,5,16,6,schön,meteotest
+2021-04-27,2021-04-26 11:01:27,Bern,0,5,16,5,schön,meteotest
+2021-04-28,2021-04-26 11:01:27,Bern,5,5,16,7,leicht bewölkt,meteotest
+2021-04-29,2021-04-26 11:01:27,Bern,19,60,14,9,Regenschauer,meteotest
+2021-04-30,2021-04-26 11:01:27,Bern,3,60,15,6,Regenschauer,meteotest
+2021-04-26,2021-04-26 11:01:39,Zuerich,0,5,16,6,schön,meteotest
+2021-04-27,2021-04-26 11:01:39,Zuerich,0,5,16,5,schön,meteotest
+2021-04-28,2021-04-26 11:01:39,Zuerich,5,5,16,7,leicht bewölkt,meteotest
+2021-04-29,2021-04-26 11:01:39,Zuerich,19,60,14,9,Regenschauer,meteotest
+2021-04-30,2021-04-26 11:01:39,Zuerich,3,60,15,6,Regenschauer,meteotest
+2021-04-26,2021-04-26 11:01:50,Luzern,0,5,16,6,leicht bewölkt,meteotest
+2021-04-27,2021-04-26 11:01:50,Luzern,0,5,16,6,leicht bewölkt,meteotest
+2021-04-28,2021-04-26 11:01:50,Luzern,2,5,17,8,stark bewölkt,meteotest
+2021-04-29,2021-04-26 11:01:51,Luzern,11,40,14,9,starker Regen,meteotest
+2021-04-30,2021-04-26 11:01:51,Luzern,4,40,16,7,Regenschauer,meteotest
+2021-04-26,2021-04-26 11:02:03,Fribourg,0,5,14,7,schön,meteotest
+2021-04-27,2021-04-26 11:02:03,Fribourg,0,5,15,5,leicht bewölkt,meteotest
+2021-04-28,2021-04-26 11:02:03,Fribourg,3,5,15,7,leicht bewölkt,meteotest
+2021-04-29,2021-04-26 11:02:03,Fribourg,15,60,12,9,Regenschauer,meteotest
+2021-04-30,2021-04-26 11:02:03,Fribourg,3,50,14,5,Regenschauer,meteotest
+2021-04-26,2021-04-26 11:02:15,Jungfraujoch,1,5,-2,-7,schön,meteotest
+2021-04-27,2021-04-26 11:02:15,Jungfraujoch,0,5,-4,-7,schön,meteotest
+2021-04-28,2021-04-26 11:02:15,Jungfraujoch,2,60,-4,-8,Schneeschauer,meteotest
+2021-04-29,2021-04-26 11:02:15,Jungfraujoch,12,80,-4,-8,Schneeschauer,meteotest
+2021-04-30,2021-04-26 11:02:15,Jungfraujoch,4,60,-5,-8,Schneeschauer,meteotest
+2021-04-27,2021-04-27 11:07:05,Bern,0,5,17,4,schön,meteotest
+2021-04-28,2021-04-27 11:07:05,Bern,4,5,17,7,leicht bewölkt,meteotest
+2021-04-29,2021-04-27 11:07:05,Bern,15,70,13,9,Regenschauer,meteotest
+2021-04-30,2021-04-27 11:07:05,Bern,3,60,15,7,Regenschauer,meteotest
+2021-05-01,2021-04-27 11:07:06,Bern,26,60,13,7,Regenschauer,meteotest
+2021-04-27,2021-04-27 11:07:16,Zuerich,0,5,17,4,schön,meteotest
+2021-04-28,2021-04-27 11:07:16,Zuerich,4,5,17,7,leicht bewölkt,meteotest
+2021-04-29,2021-04-27 11:07:16,Zuerich,15,70,13,9,Regenschauer,meteotest
+2021-04-30,2021-04-27 11:07:16,Zuerich,3,60,15,7,Regenschauer,meteotest
+2021-05-01,2021-04-27 11:07:16,Zuerich,26,60,13,7,Regenschauer,meteotest
+2021-04-27,2021-04-27 11:07:27,Luzern,0,5,17,5,schön,meteotest
+2021-04-28,2021-04-27 11:07:27,Luzern,2,5,18,8,stark bewölkt,meteotest
+2021-04-29,2021-04-27 11:07:27,Luzern,9,40,15,10,starker Regen,meteotest
+2021-04-30,2021-04-27 11:07:27,Luzern,2,50,16,7,Regenschauer,meteotest
+2021-05-01,2021-04-27 11:07:27,Luzern,17,60,14,9,Regenschauer,meteotest
+2021-04-27,2021-04-27 11:07:34,Fribourg,0,5,16,4,schön,meteotest
+2021-04-28,2021-04-27 11:07:34,Fribourg,4,5,15,7,leicht bewölkt,meteotest
+2021-04-29,2021-04-27 11:07:35,Fribourg,11,70,12,9,Regenschauer,meteotest
+2021-04-30,2021-04-27 11:07:35,Fribourg,4,60,14,6,Regenschauer,meteotest
+2021-05-01,2021-04-27 11:07:35,Fribourg,18,70,12,7,Regenschauer,meteotest
+2021-04-27,2021-04-27 11:07:44,Jungfraujoch,0,5,-3,-8,schön,meteotest
+2021-04-28,2021-04-27 11:07:44,Jungfraujoch,1,60,-4,-8,Schneeschauer,meteotest
+2021-04-29,2021-04-27 11:07:44,Jungfraujoch,8,80,-4,-8,Schneeschauer,meteotest
+2021-04-30,2021-04-27 11:07:44,Jungfraujoch,2,40,-4,-8,Schneeschauer,meteotest
+2021-05-01,2021-04-27 11:07:44,Jungfraujoch,18,80,-5,-8,Schneeschauer,meteotest
+28.4,2021-04-28 11:05:13,Bern,8,5,17,8,leicht bewölkt,meteotest
+29.4,2021-04-28 11:05:13,Bern,9,70,14,9,Regenschauer,meteotest
+30.4,2021-04-28 11:05:13,Bern,7,60,12,7,Regenschauer,meteotest
+1.5,2021-04-28 11:05:13,Bern,15,60,13,7,Regenschauer,meteotest
+2.5,2021-04-28 11:05:13,Bern,41,80,10,7,starker Regen,meteotest
+28.4,2021-04-28 11:05:25,Zuerich,8,5,17,8,leicht bewölkt,meteotest
+29.4,2021-04-28 11:05:25,Zuerich,9,70,14,9,Regenschauer,meteotest
+30.4,2021-04-28 11:05:25,Zuerich,7,60,12,7,Regenschauer,meteotest
+1.5,2021-04-28 11:05:25,Zuerich,15,60,13,7,Regenschauer,meteotest
+2.5,2021-04-28 11:05:26,Zuerich,41,80,10,7,starker Regen,meteotest
+28.4,2021-04-28 11:05:33,Luzern,3,5,18,8,stark bewölkt,meteotest
+29.4,2021-04-28 11:05:33,Luzern,6,50,14,10,Regenschauer,meteotest
+30.4,2021-04-28 11:05:33,Luzern,4,50,12,7,Regenschauer,meteotest
+1.5,2021-04-28 11:05:33,Luzern,13,60,14,8,Regenschauer,meteotest
+2.5,2021-04-28 11:05:34,Luzern,31,70,10,7,starker Regen,meteotest
+28.4,2021-04-28 11:05:41,Fribourg,3,5,15,9,leicht bewölkt,meteotest
+29.4,2021-04-28 11:05:41,Fribourg,8,70,12,9,Regenschauer,meteotest
+30.4,2021-04-28 11:05:41,Fribourg,7,60,11,6,Regenschauer,meteotest
+1.5,2021-04-28 11:05:41,Fribourg,15,60,12,6,Regenschauer,meteotest
+2.5,2021-04-28 11:05:42,Fribourg,26,80,10,6,starker Regen,meteotest
+28.4,2021-04-28 11:05:50,Jungfraujoch,1,80,-4,-8,Schneeschauer,meteotest
+29.4,2021-04-28 11:05:50,Jungfraujoch,6,90,-4,-8,Schneeschauer,meteotest
+30.4,2021-04-28 11:05:50,Jungfraujoch,4,70,-4,-8,Schneeschauer,meteotest
+1.5,2021-04-28 11:05:50,Jungfraujoch,15,80,-4,-8,Schneefall,meteotest
+2.5,2021-04-28 11:05:51,Jungfraujoch,26,80,-7,-9,Schneefall,meteotest
+29.4,2021-04-29 11:06:52,Bern,10,60,14,9,starker Regen,meteotest
+30.4,2021-04-29 11:06:53,Bern,7,60,12,7,Regenschauer,meteotest
+1.5,2021-04-29 11:06:53,Bern,21,60,13,7,Regenschauer,meteotest
+2.5,2021-04-29 11:06:53,Bern,27,80,10,7,starker Regen,meteotest
+3.5,2021-04-29 11:06:53,Bern,<0.1,60,14,3,leicht bewölkt,meteotest
+29.4,2021-04-29 11:07:06,Zuerich,10,60,14,9,starker Regen,meteotest
+30.4,2021-04-29 11:07:06,Zuerich,7,60,12,7,Regenschauer,meteotest
+1.5,2021-04-29 11:07:06,Zuerich,21,60,13,7,Regenschauer,meteotest
+2.5,2021-04-29 11:07:06,Zuerich,27,80,10,7,starker Regen,meteotest
+3.5,2021-04-29 11:07:07,Zuerich,<0.1,60,14,3,leicht bewölkt,meteotest
+29.4,2021-04-29 11:07:15,Luzern,11,70,14,10,starker Regen,meteotest
+30.4,2021-04-29 11:07:15,Luzern,4,70,12,7,Regenschauer,meteotest
+1.5,2021-04-29 11:07:15,Luzern,13,60,13,8,Regenschauer,meteotest
+2.5,2021-04-29 11:07:15,Luzern,34,80,9,7,starker Regen,meteotest
+3.5,2021-04-29 11:07:15,Luzern,2,60,14,4,Regenschauer,meteotest
+29.4,2021-04-29 11:07:24,Fribourg,7,80,12,9,starker Regen,meteotest
+30.4,2021-04-29 11:07:24,Fribourg,7,80,11,6,Regenschauer,meteotest
+1.5,2021-04-29 11:07:24,Fribourg,17,60,12,6,Regenschauer,meteotest
+2.5,2021-04-29 11:07:24,Fribourg,23,80,9,6,starker Regen,meteotest
+3.5,2021-04-29 11:07:25,Fribourg,<0.1,70,13,2,leicht bewölkt,meteotest
+29.4,2021-04-29 11:07:35,Jungfraujoch,6,90,-4,-8,Schneeschauer,meteotest
+30.4,2021-04-29 11:07:35,Jungfraujoch,3,90,-4,-8,Schneeschauer,meteotest
+1.5,2021-04-29 11:07:35,Jungfraujoch,19,80,-3,-8,Schneeschauer,meteotest
+2.5,2021-04-29 11:07:35,Jungfraujoch,26,80,-7,-10,Schneeschauer,meteotest
+3.5,2021-04-29 11:07:36,Jungfraujoch,1,60,-9,-14,Schneeschauer,meteotest
+30.4,2021-04-30 11:08:15,Bern,5,80,11,8,Regenschauer,meteotest
+1.5,2021-04-30 11:08:16,Bern,30,70,11,7,starker Regen,meteotest
+2.5,2021-04-30 11:08:16,Bern,20,80,10,5,starker Regen,meteotest
+3.5,2021-04-30 11:08:16,Bern,<0.1,80,14,3,stark bewölkt,meteotest
+4.5,2021-04-30 11:08:16,Bern,4,40,14,3,Regenschauer,meteotest
+30.4,2021-04-30 11:08:29,Zuerich,5,80,11,8,Regenschauer,meteotest
+1.5,2021-04-30 11:08:29,Zuerich,30,70,11,7,starker Regen,meteotest
+2.5,2021-04-30 11:08:29,Zuerich,20,80,10,5,starker Regen,meteotest
+3.5,2021-04-30 11:08:30,Zuerich,<0.1,80,14,3,stark bewölkt,meteotest
+4.5,2021-04-30 11:08:30,Zuerich,4,40,14,3,Regenschauer,meteotest
+30.4,2021-04-30 11:08:42,Luzern,5,90,12,8,Regenschauer,meteotest
+1.5,2021-04-30 11:08:42,Luzern,20,50,11,7,Regenschauer,meteotest
+2.5,2021-04-30 11:08:42,Luzern,20,80,9,6,starker Regen,meteotest
+3.5,2021-04-30 11:08:42,Luzern,1,50,13,4,Regenschauer,meteotest
+4.5,2021-04-30 11:08:42,Luzern,2,5,15,4,leicht bewölkt,meteotest
+30.4,2021-04-30 11:08:51,Fribourg,6,80,10,7,Regenschauer,meteotest
+1.5,2021-04-30 11:08:51,Fribourg,19,80,10,5,Regenschauer,meteotest
+2.5,2021-04-30 11:08:51,Fribourg,19,90,8,5,starker Regen,meteotest
+3.5,2021-04-30 11:08:51,Fribourg,<0.1,80,12,2,stark bewölkt,meteotest
+4.5,2021-04-30 11:08:52,Fribourg,1,30,13,3,Regenschauer,meteotest
+30.4,2021-04-30 11:09:05,Jungfraujoch,3,90,-4,-8,Schneeschauer,meteotest
+1.5,2021-04-30 11:09:05,Jungfraujoch,23,90,-4,-7,Schneefall,meteotest
+2.5,2021-04-30 11:09:05,Jungfraujoch,22,90,-7,-11,Schneeschauer,meteotest
+3.5,2021-04-30 11:09:05,Jungfraujoch,1,70,-8,-15,Schneeschauer,meteotest
+4.5,2021-04-30 11:09:05,Jungfraujoch,2,70,-6,-10,Schneeschauer,meteotest
