@@ -10,6 +10,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 # define all locations we want to scrape
+STORAGE_PATH = '/home/Amadeus/HSLU/CIP/meteoblue.csv'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
 LOCATIONS = {
     'Freiburg': '2660718',
@@ -87,14 +88,15 @@ try:
     df['precipitation'] = df['precipitation'].str.extract(r'((?:\d+-\d+)|(?:\.\.\.))')
 
     # if a dataset already exists we append the current dataset to it
-    if Path('./meteoblue.csv').is_file():
+    
+    if Path(STORAGE_PATH).is_file():
         print(' > load and merge existing dataset')
-        df_existing = pd.read_csv('./meteoblue.csv')
+        df_existing = pd.read_csv(STORAGE_PATH)
         df = pd.concat([df_existing, df], ignore_index=True)
 
     # finally store the dataset on the disk
     print(' > write dataset to disk')
-    df.to_csv('meteoblue.csv', index=False)
+    df.to_csv(STORAGE_PATH, index=False)
 
     print(' > send e-mail notification to samuel.loertscher@gmail.com')
     send_notification('Success from CIP scraper', 'CIP scraper processed successfully')
