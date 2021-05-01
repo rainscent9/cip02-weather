@@ -17,7 +17,7 @@ LOCATIONS = {
     'Bern': '2661552',
     'Zürich': '2657896',
     'Luzern': '2659811',
-    'Jungfroujoch': '2660208'}
+    'Jungfraujoch': '2660208'}
 
 # setup a sendgrid client
 sg = SendGridAPIClient('---')
