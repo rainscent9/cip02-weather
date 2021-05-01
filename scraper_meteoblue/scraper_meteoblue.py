@@ -1,9 +1,32 @@
+# import all required libraries
+from pathlib import Path
+import time
+import random
+import re
+from datetime import datetime
+import pandas as pd
+import mechanicalsoup
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
 # define all locations we want to scrape
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
-LOCATIONS = ['Freiburg', 'Bern', 'Zürich', 'Luzern', 'Jungfroujoch']
+LOCATIONS = {
+    'Freiburg': '2660718',
+    'Bern': '2661552',
+    'Zürich': '2657896',
+    'Luzern': '2659811',
+    'Jungfroujoch': '2660208'}
 
 # setup a sendgrid client
 sg = SendGridAPIClient('---')
+
+def send_notification(subject, message):
+    sg.send(Mail(
+        from_email='notifications@airborne.swiss',
+        to_emails='samuel.loertscher@gmail.com',
+        subject=subject,
+        html_content=f'<strong>{message}</strong>'))
 
 try:
     # load current data if any such already exist
@@ -24,9 +47,9 @@ try:
         raise_on_404=True)
 
     # iterate over each location individually
-    for location in LOCATIONS:
+    for location, id in LOCATIONS.items():
         # browse the current location and isolate the part in which the content is to be found
-        url = f'https://www.meteoblue.com/de/wetter/woche/{location.lower()}_schweiz'
+        url = f'https://www.meteoblue.com/de/wetter/woche/{location.lower()}_schweiz_{id}'
         print(f' > fetch url: {url}')
         browser.open(url)
         wrapper = browser.page.select('main > .grid > #tab_results > #tab_wrapper')
@@ -74,18 +97,8 @@ try:
     df.to_csv('meteoblue.csv', index=False)
 
     print(' > send e-mail notification to samuel.loertscher@gmail.com')
-    
-    sg.send(Mail(
-        from_email='notifications@airborne.swiss',
-        to_emails='samuel.loertscher@gmail.com',
-        subject='Success from CIP scraper',
-        html_content=f'<strong>CIP scraper processed successfully</strong>'))
+    send_notification('Success from CIP scraper', 'CIP scraper processed successfully')
 except Exception as exp:
     print(f' > ERROR: {exp}')
     print(' > send e-mail notification to samuel.loertscher@gmail.com')
-
-    sg.send(Mail(
-        from_email='notifications@airborne.swiss',
-        to_emails='samuel.loertscher@gmail.com',
-        subject='Error from CIP scraper',
-        html_content=f'<strong>ERROR: {exp}</strong>'))
+    send_notification('Error from CIP scraper', f'ERROR: {exp}')
