@@ -1,17 +1,9 @@
-# import all required libraries
-from pathlib import Path
-import time
-import random
-import re
-from datetime import datetime
-import pandas as pd
-import mechanicalsoup
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-
 # define all locations we want to scrape
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
 LOCATIONS = ['Freiburg', 'Bern', 'Zürich', 'Luzern', 'Jungfroujoch']
+
+# setup a sendgrid client
+sg = SendGridAPIClient('---')
 
 try:
     # load current data if any such already exist
@@ -58,7 +50,7 @@ try:
                 'wind': day.select_one('.data .wind').text,
                 'precipitation': day.select_one('.data .tab_precip').text,
                 'forecast': day.select_one('.weather img')['title']
-            })
+            }, ignore_index=True)
 
         # wait between 0.5s and 1.0s to avoid suspicion
         time.sleep(0.5 + 0.5 * random.random())
@@ -80,13 +72,20 @@ try:
     # finally store the dataset on the disk
     print(' > write dataset to disk')
     df.to_csv('meteoblue.csv', index=False)
-except Exception as exp:
-    print(f' > ERROR: {exp}')
+
     print(' > send e-mail notification to samuel.loertscher@gmail.com')
     
-    sg = SendGridAPIClient('---')
     sg.send(Mail(
         from_email='notifications@airborne.swiss',
         to_emails='samuel.loertscher@gmail.com',
-        subject='error from CIP scraper',
+        subject='Success from CIP scraper',
+        html_content=f'<strong>CIP scraper processed successfully</strong>'))
+except Exception as exp:
+    print(f' > ERROR: {exp}')
+    print(' > send e-mail notification to samuel.loertscher@gmail.com')
+
+    sg.send(Mail(
+        from_email='notifications@airborne.swiss',
+        to_emails='samuel.loertscher@gmail.com',
+        subject='Error from CIP scraper',
         html_content=f'<strong>ERROR: {exp}</strong>'))
