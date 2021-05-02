@@ -7,26 +7,33 @@ import random
 import time
 # Selenium
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-
+# Selenium exception handling inspired from:
+# https://www.pingshiuanchua.com/blog/post/error-handling-in-selenium-on-python
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import WebDriverException
 
 # define variables
-# PATH = '/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/cip02-weather/scraper_meteotest/'
-PATH = '/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/Project/'
 PATH_DRIVER = '/usr/lib/chromium-browser/chromedriver'
 WEBPAGE_WEATHER = 'https://meteotest.ch/wetter/ortswetter/'
 WEBPAGE_WIND = 'https://meteotest.ch/wetter/wind/'
-LOCATIONS = ['Bern', 'Zuerich', 'Luzern', 'Fribourg', 'Jungfraujoch']
-SIMULATION = 0  # 1:ON, 0:OFF
-
-# create log file
-if not SIMULATION:
-    logging.basicConfig(filename=PATH + 'meteotest_scraper_' + '.log',
-                        level=logging.WARNING)
+LOCATIONS = ['Bern', 'Zürich', 'Luzern', 'Fribourg', 'Jungfraujoch']
+SIMULATION = 1  # 1:ON, 0:OFF
+if SIMULATION:
+    PATH = '/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/cip02-weather/scraper_meteotest/'
+    # create log file
+    logging.basicConfig(filename=PATH + 'meteotest_scraper' + '.log',
+                        level=logging.INFO)
+else:
+    PATH = '/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/Project/'
+    # create log file
+    logging.basicConfig(filename=PATH + 'meteotest_scraper' + '.log',
+                        level=logging.ERROR)
 
 
 def scraper_weather():
@@ -37,49 +44,66 @@ def scraper_weather():
     # create empty pandas dataframe
     df_weather_data = pd.DataFrame()
     df_wind_data = pd.DataFrame()
+    # set user-agent
+    opts = Options()
+    opts.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
     try:
-        # set user-agent
-        opts = Options()
-        opts.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
         # create Chrome web driver object
         driver = webdriver.Chrome(executable_path=PATH_DRIVER, options=opts)
+    except WebDriverException:
+        # create error / warning log message
+        logging.warning(
+            msg=str(datetime.now()).rsplit(".")[0] + ' Exception web driver (e.g. bad web driver path)')
+        return None
 
-        for location in LOCATIONS:
-            # WIND FORECAST HOURLY
-            # open webpage - wind
-            driver.get(WEBPAGE_WIND + location)
+    for location in LOCATIONS:
+        # WIND FORECAST HOURLY
+        # open webpage - wind
+        driver.get(WEBPAGE_WIND + location)
 
-            # select the division with the forecast
-            delay = 5  # max time to load page in seconds
+        # select the division with the forecast
+        delay = 5  # max time to load page in seconds
+        try:
+            # wait until the class with the forecast is loaded
+            wind = WebDriverWait(driver, delay).until(ec.presence_of_element_located((
+                By.CSS_SELECTOR, '.container > .weatherPanel > .windTable')))
+            # create info log message
+            logging.info(msg=str(datetime.now()).rsplit(".")[0] + ' wind page load ok for location: ' + location)
+        except TimeoutException:
+            # create error / warning log message
+            logging.warning(
+                msg=str(datetime.now()).rsplit(".")[0] + ' Exception wind page load for location: ' + location)
+            return None
+        # wait before clicking
+        time.sleep(15)
+        # iterate over 5 days
+        for day in range(0, 5):
+            # click on day i
             try:
-                # wait until the class with the forecast is loaded
-                wind = WebDriverWait(driver, delay).until(EC.presence_of_element_located((
-                    By.CSS_SELECTOR, '.container > .weatherPanel > .windTable')))
-                # create info log message
-                logging.info(msg=str(datetime.now()).rsplit(".")[0] + ' wind page load ok for location: ' + location)
-            except TimeoutException:
-                # create error / warning log message
-                logging.warning(
-                    msg=str(datetime.now()).rsplit(".")[0] + ' wind page load error for location: ' + location)
-            # wait before clicking
-            time.sleep(15)
-            # iterate over 5 days
-            for day in range(0, 5):
-                # click on day i
                 driver.find_elements_by_css_selector('.tablistContainer > .nav.nav-tabs span[class="hidden-xs"]')[
                     day].click()
-                # wait for page to load
-                time.sleep(2)
+            except ElementClickInterceptedException:
+                logging.warning(
+                    msg=str(datetime.now()).rsplit(".")[0] +
+                    ' Exception wind page clicking for location: ' + location)
+            except NoSuchElementException:
+                logging.warning(
+                    msg=str(datetime.now()).rsplit(".")[0] +
+                    ' Exception wind page clicking (element not found) for location: ' + location)
 
+            # wait for page to load
+            time.sleep(2)
+
+            try:
                 # load division with wind forecast table per day
                 # (hourly data, 24 entries, 2 tables of 12 entries, both with header)
-                data = wind.find_elements_by_css_selector(".weatherPanelHalf > .stundenPrognoseRow")
+                forecast = wind.find_elements_by_css_selector(".weatherPanelHalf > .stundenPrognoseRow")
 
                 # remove second header (from table of second half of the day)
-                del data[13]
+                del forecast[13]
                 # ignore first header ()
-                for d in data[1:]:
+                for d in forecast[1:]:
                     data = {"date_scraped": str(datetime.now()).rsplit(".")[0],
                             "website_scraped": 'meteotest',
                             "date_forecast": str(datetime.now() + timedelta(days=day)).rsplit(" ")[0],
@@ -98,25 +122,33 @@ def scraper_weather():
                                     0].text}
                     df_wind_data = df_wind_data.append(data, ignore_index=True)
 
-            # sleep for a random amount of time
-            time.sleep(random.randint(3, 9))
+            except NoSuchElementException:
+                logging.warning(
+                    msg=str(datetime.now()).rsplit(".")[0] +
+                    ' Exception wind page extracting (element not found) for location: ' + location)
 
-            # WEATHER FORECAST DAILY
-            # open webpage
-            driver.get(WEBPAGE_WEATHER + location)
+        # sleep for a random amount of time
+        time.sleep(random.randint(3, 9))
 
-            # select the division with the forecast
-            delay = 5  # max time to load page in seconds
-            try:
-                # wait until the class with the forecast is loaded
-                forecast = WebDriverWait(driver, delay).until(EC.presence_of_element_located((
-                    By.CSS_SELECTOR, '.fivedaysforecast > .container > .row > .tablistContainer')))
-                # create info log message
-                logging.info(msg=str(datetime.now()).rsplit(".")[0] + ' page load ok for location: ' + location)
-            except TimeoutException:
-                # create error / warning log message
-                logging.warning(msg=str(datetime.now()).rsplit(".")[0] + ' page load error for location: ' + location)
+        # WEATHER FORECAST DAILY
+        # open webpage
+        driver.get(WEBPAGE_WEATHER + location)
 
+        # select the division with the forecast
+        delay = 5  # max time to load page in seconds
+        try:
+            # wait until the class with the forecast is loaded
+            forecast = WebDriverWait(driver, delay).until(ec.presence_of_element_located((
+                By.CSS_SELECTOR, '.fivedaysforecast > .container > .row > .tablistContainer')))
+            # create info log message
+            logging.info(msg=str(datetime.now()).rsplit(".")[0] + ' page load ok for location: ' + location)
+        except TimeoutException:
+            # create error / warning log message
+            logging.warning(
+                msg=str(datetime.now()).rsplit(".")[0] + ' Exception page load for location: ' + location)
+            return None
+
+        try:
             # get the sections with the corresponding information
             dates = forecast.find_elements_by_css_selector(".registerDateTime")  # ok
             temps_min = forecast.find_elements_by_css_selector("span[class='celsius min']")  # ok
@@ -124,8 +156,7 @@ def scraper_weather():
             icons = forecast.find_elements_by_css_selector(".registerIcon img")  # ok
             rain_percent = forecast.find_elements_by_css_selector(".tabRain span[class='percent']")  # ok
             rain_mm = forecast.find_elements_by_css_selector(".tabRain span[class='mm']")  # ok
-
-            # iterate over five days
+            # iterate over five days - extract data by day
             for day in range(0, 5):
                 data = {"date_scraped": str(datetime.now()).rsplit(".")[0],
                         "website_scraped": 'meteotest',
@@ -139,24 +170,27 @@ def scraper_weather():
 
                 # store dataframe into pandas dataframe
                 df_weather_data = df_weather_data.append(data, ignore_index=True)
-            time.sleep(random.randint(3, 9))
-        # write .csv files for backup
-        writer(df_wind_data, info='wind', path=PATH)
-        writer(df_weather_data, info='weather_dirty', path=PATH)
 
-        # Data wrangling: wind forecast df
-        df_wind_data = clean_wind(df=df_wind_data)
-        # Data wrangling: weather forecast df
-        df_weather_data = clean_weather(df=df_weather_data)
+        except NoSuchElementException:
+            logging.warning(
+                msg=str(datetime.now()).rsplit(".")[0] +
+                ' Exception weather page (element not found) for location: ' + location)
 
-        # merge df with weather and wind
-        df_weather_data = pd.merge(df_weather_data, df_wind_data, how='left', on=['location', 'date_forecast'])
+        time.sleep(random.randint(3, 9))
+    # write .csv files for backup
+    writer(df_wind_data, info='wind', path=PATH)
+    writer(df_weather_data, info='weather', path=PATH)
 
-    except Exception:
-        logging.warning(msg=str(datetime.now()).rsplit(".")[0] + ' scraper error: ' + Exception)
-    finally:
-        # close Chrome window
-        driver.quit()
+    # Data wrangling: wind forecast df
+    df_wind_data = clean_wind(df=df_wind_data)
+    # Data wrangling: weather forecast df
+    df_weather_data = clean_weather(df=df_weather_data)
+
+    # merge df with weather and wind
+    df_weather_data = pd.merge(df_weather_data, df_wind_data, how='left', on=['location', 'date_forecast'])
+
+    # close Chrome window
+    driver.quit()
 
     # return merged df with weather and wind
     return df_weather_data
@@ -170,7 +204,7 @@ def clean_wind(df):
     df.loc[:, mask] = df.loc[:, mask].astype('int')
     df['date_forecast'] = pd.to_datetime(df['date_forecast'], format='%Y-%m-%d')
     df['date_scraped'] = pd.to_datetime(df['date_scraped'], format='%Y-%m-%d %H:%M:%S')
-    df_wind_processed = pd.DataFrame()
+
     df_wind_processed = df.groupby(['location', 'date_forecast'], as_index=False)['wind_peak'].agg('max')
     # df_wind_data_.groupby(['location', 'date_forecast'], as_index=False)['wind_mean'].agg('mean') # nok
     # --> könnte mit dem zusammenhangen: https://github.com/pandas-dev/pandas/issues/33515
@@ -178,7 +212,7 @@ def clean_wind(df):
                                  df.groupby(['location', 'date_forecast'], as_index=False)['wind_mean'].agg(
                                      lambda x: np.sum(x) / 24),
                                  how='left', on=['location', 'date_forecast'])
-    return df
+    return df_wind_processed
 
 
 def clean_weather(df):
@@ -187,8 +221,8 @@ def clean_weather(df):
 
     # set date from dd.m --> yyyy-mm-dd
     df['date_forecast'] = str(pd.to_datetime(today).year) + '-' + \
-                          df['date_forecast'].str.split('.').apply(lambda x: str(x[1]).zfill(2)) + '-' + \
-                          df['date_forecast'].str.split('.').apply(lambda x: str(x[0]).zfill(2))
+        df['date_forecast'].str.split('.').apply(lambda x: str(x[1]).zfill(2)) + '-' + \
+        df['date_forecast'].str.split('.').apply(lambda x: str(x[0]).zfill(2))
     # make 'date_forecast' of type datetime
     df['date_forecast'] = pd.to_datetime(df['date_forecast'], format='%Y-%m-%d')
 
@@ -242,4 +276,4 @@ while not SIMULATION:
     time.sleep(30)
 # execute this once when simulation active:
 df_forecast = scraper_weather()
-writer(df_forecast, info='test', path=PATH)
+writer(df_forecast, info='clean', path=PATH)
