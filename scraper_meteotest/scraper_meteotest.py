@@ -33,7 +33,7 @@ else:
     PATH = '/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/Project/'
     # create log file
     logging.basicConfig(filename=PATH + 'meteotest_scraper' + '.log',
-                        level=logging.ERROR)
+                        level=logging.INFO)  # for long uptimes set level to WARNING or ERROR
 
 
 def scraper_weather():
