@@ -18,6 +18,34 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.common.exceptions import WebDriverException
 
+'''
+This script is designed to scrape weather forecasts from meteotest.ch. It can be run in simulation mode or in continuous 
+mode.
+For CONTINUOUS MODE (will scrape meteotest.ch ever morning at 11:00 am):
+1. in "scraper_start.sh" set the path of the virtual environment
+2. copy "scraper_start.sh", "scraper_meteotest.py" and folder "scraped" to the desired location
+3. open terminal in that very location and:
+    chmod -x scraper_start.sh
+    chmod -x scraper_meteotest.py
+4. execute "scraper_start.sh"
+
+CONFIGURABLE:
+- PATH_DRIVER (chrome driver for Selenium)
+- LOCATIONS (any city in Switzerland can be added)
+- SIMULATION (1: instantly execute scraping
+              0: run in loop, only execute scraping at 11:00 am)
+
+OUTPUT (in folder scraped):
+- Daily files:
+    - meteotest_wind_DATE.csv
+    - meteotest_weather_DATE.csv
+    - meteotest_clean_DATE.csv
+- Combined values over (will be appended forever)
+    - meteotest_combined_clean.csv (USE THIS FILE FOR FURTHER PROCESSING)
+    - meteotest_combined_weather.csv
+    - meteotest_combined_wind.csv (hourly wind forecasts)
+'''
+
 # define variables
 PATH_DRIVER = '/usr/lib/chromium-browser/chromedriver'
 WEBPAGE_WEATHER = 'https://meteotest.ch/wetter/ortswetter/'
@@ -36,12 +64,12 @@ else:
                         level=logging.INFO)  # for long uptimes set level to WARNING or ERROR
 
 
+# Main scraper function, in simulation mode it takes about 5 min to scrape the data
 def scraper_weather():
-    # Start cronjob within 5 minutes
+    # Start job within 5 minutes
     if not SIMULATION:
         time.sleep(random.randint(1, 600))
-
-    # create empty pandas dataframe
+    # create empty pandas dataframes
     df_weather_data = pd.DataFrame()
     df_wind_data = pd.DataFrame()
     # set user-agent
@@ -56,12 +84,11 @@ def scraper_weather():
         logging.warning(
             msg=str(datetime.now()).rsplit(".")[0] + ' Exception web driver (e.g. bad web driver path)')
         return None
-
+    # iterate over all locations
     for location in LOCATIONS:
         # WIND FORECAST HOURLY
         # open webpage - wind
         driver.get(WEBPAGE_WIND + location)
-
         # select the division with the forecast
         delay = 5  # max time to load page in seconds
         try:
@@ -91,15 +118,12 @@ def scraper_weather():
                 logging.warning(
                     msg=str(datetime.now()).rsplit(".")[0] +
                     ' Exception wind page clicking (element not found) for location: ' + location)
-
             # wait for page to load
             time.sleep(2)
-
             try:
                 # load division with wind forecast table per day
                 # (hourly data, 24 entries, 2 tables of 12 entries, both with header)
                 forecast = wind.find_elements_by_css_selector(".weatherPanelHalf > .stundenPrognoseRow")
-
                 # remove second header (from table of second half of the day)
                 del forecast[13]
                 # ignore first header ()
@@ -126,14 +150,12 @@ def scraper_weather():
                 logging.warning(
                     msg=str(datetime.now()).rsplit(".")[0] +
                     ' Exception wind page extracting (element not found) for location: ' + location)
-
         # sleep for a random amount of time
         time.sleep(random.randint(3, 9))
 
         # WEATHER FORECAST DAILY
         # open webpage
         driver.get(WEBPAGE_WEATHER + location)
-
         # select the division with the forecast
         delay = 5  # max time to load page in seconds
         try:
@@ -180,18 +202,14 @@ def scraper_weather():
     # write .csv files for backup
     writer(df_wind_data, info='wind', path=PATH)
     writer(df_weather_data, info='weather', path=PATH)
-
     # Data wrangling: wind forecast df
     df_wind_data = clean_wind(df=df_wind_data)
     # Data wrangling: weather forecast df
     df_weather_data = clean_weather(df=df_weather_data)
-
     # merge df with weather and wind
     df_weather_data = pd.merge(df_weather_data, df_wind_data, how='left', on=['location', 'date_forecast'])
-
     # close Chrome window
     driver.quit()
-
     # return merged df with weather and wind
     return df_weather_data
 
@@ -218,14 +236,12 @@ def clean_wind(df):
 def clean_weather(df):
     # get time today in format YYYY:MM:DD HH:MM:SS
     today = str(datetime.now()).rsplit(".")[0]
-
     # set date from dd.m --> yyyy-mm-dd
     df['date_forecast'] = str(pd.to_datetime(today).year) + '-' + \
         df['date_forecast'].str.split('.').apply(lambda x: str(x[1]).zfill(2)) + '-' + \
         df['date_forecast'].str.split('.').apply(lambda x: str(x[0]).zfill(2))
     # make 'date_forecast' of type datetime
     df['date_forecast'] = pd.to_datetime(df['date_forecast'], format='%Y-%m-%d')
-
     # Create dataframe to convert forecast name to number
     df_enum = pd.DataFrame({'forecast': ['schön',
                                          'leicht bewölkt',
@@ -247,12 +263,10 @@ def clean_weather(df):
     df_enum['forecast'] = df_enum['forecast'].str.lower()
     # set index from 1 upwards
     df_enum = df_enum.set_index(df_enum.index + 1)
-
     # create dictionary from dataframe enum
     dict_forecast = df_enum.to_dict()
     # invert the key-value pairs
     dict_forecast = {v: k for k, v in dict_forecast['forecast'].items()}
-
     # add a new row with a numeric forecast
     df['weather_forecast_numeric'] = df['weather_forecast'].str.lower().replace(dict_forecast)
     return df
@@ -269,11 +283,12 @@ def writer(df, info='no_info', path=''):
     df.to_csv(filename_combined, mode='a', header=False, index=False)
 
 
-while not SIMULATION:
-    if (datetime.now().hour == 11) and (datetime.now().minute == 0):
-        df_forecast = scraper_weather()
-        writer(df_forecast, info='clean', path=PATH)
-    time.sleep(30)
-# execute this once when simulation active:
-df_forecast = scraper_weather()
-writer(df_forecast, info='clean', path=PATH)
+if __name__ == "__main__":
+    while not SIMULATION:
+        if (datetime.now().hour == 11) and (datetime.now().minute == 0):
+            df_forecast = scraper_weather()
+            writer(df_forecast, info='clean', path=PATH)
+        time.sleep(30)
+    # execute this once when simulation active:
+    df_forecast = scraper_weather()
+    writer(df_forecast, info='clean', path=PATH)
