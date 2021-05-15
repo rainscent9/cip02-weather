@@ -96,7 +96,7 @@ data_dir = {'bicycle':
 
 if __name__ == "__main__":
     # create folder 'scraped' if not jet existing
-    Path(PATH + '/scraped').mkdir(parents=True, exist_ok=True)
+    Path(PATH + '/download').mkdir(parents=True, exist_ok=True)
     # download data, main
     for i in data_dir:
         csv_writer(data_dir[i][0](pd.read_csv(data_dir[i][1])), i)
