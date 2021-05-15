@@ -1,3 +1,38 @@
+#!/usr/bin/env python3
+# 2021-05
+# Simon Bolzli
+# This script is designed to scrape weather forecasts from meteotest.ch.
+# It can be run in simulation mode or in continuous mode.
+#
+# For CONTINUOUS MODE (will scrape meteotest.ch ever morning at 11:00 am):
+# 1. in "scraper_start.sh" set the path of the virtual environment
+# 2. copy "scraper_start.sh", "scraper_meteotest.py" and folder "scraped" to the desired location
+# 3. open terminal in that very location and:
+#         chmod -x scraper_start.sh
+#         chmod -x scraper_meteotest.py
+# 4. execute "scraper_start.sh"
+#
+# CONFIGURABLE:
+# - PATH (path for data files, can be different for running and debuging)
+# - PATH_DRIVER (chrome driver for Selenium)
+# - LOCATIONS (any city in Switzerland can be added)
+# - SIMULATION (1: instantly execute scraping
+#               0: run in loop, only execute scraping at 11:00 am)
+#
+# INPUT:
+# - Weather:  5 day forecast, 1 day resolution, from meteotest.ch
+# - Wind:     5 day forecast, 1 hour resolution, from meteotest.ch
+#
+# OUTPUT (in folder scraped):
+# - Daily files:
+#     - meteotest_wind_DATE.csv
+#     - meteotest_weather_DATE.csv
+#     - meteotest_clean_DATE.csv
+# - Combined values over (following files will be appended forever)
+#     - meteotest_combined_clean.csv (USE THIS FILE FOR FURTHER PROCESSING)
+#     - meteotest_combined_weather.csv
+#     - meteotest_combined_wind.csv
+
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
@@ -18,40 +53,6 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.common.exceptions import WebDriverException
-
-'''
-This script is designed to scrape weather forecasts from meteotest.ch. It can be run in simulation mode or in continuous 
-mode.
-
-For CONTINUOUS MODE (will scrape meteotest.ch ever morning at 11:00 am):
-1. in "scraper_start.sh" set the path of the virtual environment
-2. copy "scraper_start.sh", "scraper_meteotest.py" and folder "scraped" to the desired location
-3. open terminal in that very location and:
-        chmod -x scraper_start.sh
-        chmod -x scraper_meteotest.py
-4. execute "scraper_start.sh"
-
-CONFIGURABLE:
-- PATH (path for data files, can be different for running and debuging)
-- PATH_DRIVER (chrome driver for Selenium)
-- LOCATIONS (any city in Switzerland can be added)
-- SIMULATION (1: instantly execute scraping
-              0: run in loop, only execute scraping at 11:00 am)
-INPUT:
-- Weather:  5 day forecast, 1 day resolution, from meteotest.ch
-- Wind:     5 day forecast, 1 hour resolution, from meteotest.ch
-
-OUTPUT (in folder scraped):
-
-- Daily files:
-    - meteotest_wind_DATE.csv
-    - meteotest_weather_DATE.csv
-    - meteotest_clean_DATE.csv
-- Combined values over (following files will be appended forever)
-    - meteotest_combined_clean.csv (USE THIS FILE FOR FURTHER PROCESSING)
-    - meteotest_combined_weather.csv
-    - meteotest_combined_wind.csv
-'''
 
 # define variables
 PATH_DRIVER = '/usr/lib/chromium-browser/chromedriver'
@@ -110,7 +111,7 @@ def scraper_weather():
                             ' Exception wind page load for location: ' + location)
             return None
         # wait before clicking
-        time.sleep(15)
+        time.sleep(1)
         # iterate over 5 days (get each day of the forecast)
         for day in range(0, 5):
             # click a day (also clicking on first day, just to make sure we have the days in the correct order)
@@ -124,7 +125,7 @@ def scraper_weather():
                 logging.warning(msg=str(datetime.now()).rsplit('.')[0] +
                                 ' Exception wind page clicking (element not found) for location: ' + location)
             # wait for page to load
-            time.sleep(2)
+            time.sleep(1)
             try:
                 # load division with wind forecast table per day
                 # (hourly data, 24 entries, 2 tables of 12 entries, both with header)
@@ -154,7 +155,7 @@ def scraper_weather():
                 logging.warning(msg=str(datetime.now()).rsplit('.')[0] +
                                 ' Exception wind page extracting (element not found) for location: ' + location)
         # sleep for a random amount of time
-        time.sleep(random.randint(3, 15))
+        time.sleep(random.randint(1, 3))
 
         # WEATHER FORECAST DAILY
         # open webpage
@@ -200,18 +201,15 @@ def scraper_weather():
                 msg=str(datetime.now()).rsplit('.')[0] +
                 ' Exception weather page (element not found) for location: ' + location)
 
-        time.sleep(random.randint(3, 9))
-    # write .csv files for backup
-    writer(df_wind_data, info='wind', path=PATH)
-    writer(df_weather_data, info='weather', path=PATH)
+        time.sleep(random.randint(1, 3))
+    # close Chrome window
+    driver.quit()
     # Data wrangling: wind forecast df
     df_wind_data = clean_wind(df=df_wind_data)
     # Data wrangling: weather forecast df
     df_weather_data = clean_weather(df=df_weather_data)
     # merge df with weather and wind
     df_weather_data = pd.merge(df_weather_data, df_wind_data, how='left', on=['location', 'date_forecast'])
-    # close Chrome window
-    driver.quit()
     # return merged df with weather and wind
     return df_weather_data
 
@@ -225,7 +223,7 @@ def clean_wind(df):
     df.loc[:, mask] = df.loc[:, mask].astype('int')
     df['date_forecast'] = pd.to_datetime(df['date_forecast'], format='%Y-%m-%d')
     df['date_scraped'] = pd.to_datetime(df['date_scraped'], format='%Y-%m-%d %H:%M:%S')
-
+    # aggregate data from 24 entries (hourly) to 1 entry (daily)
     df_wind_processed = df.groupby(['location', 'date_forecast'], as_index=False)['wind_peak'].agg('max')
     # df_wind_data_.groupby(['location', 'date_forecast'], as_index=False)['wind_mean'].agg('mean') # nok
     # --> könnte mit dem zusammenhängen: https://github.com/pandas-dev/pandas/issues/33515
