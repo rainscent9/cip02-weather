@@ -6,7 +6,9 @@ from datetime import datetime
 PATH = '/home/student/Cloud/Owncloud/Private/SyncVM/cip02-fs21/cip02-weather/traffic_data/'
 
 
-def bicycle_reader(df):
+def bicycle_reader(df, name=''):
+    # write .csv with original data
+    csv_writer(df, name=name, status='_src')
     # replace na values with 0. Assumption: the counters are working 100% of the time, therefore na-values are 0.
     df.loc[:, 'VELO_IN':'FUSS_OUT'] = df.loc[:, 'VELO_IN':'FUSS_OUT'].fillna(0)
     # set data types
@@ -31,7 +33,9 @@ def bicycle_reader(df):
     return df
 
 
-def bus_reader(df):
+def bus_reader(df, name=''):
+    # write .csv with original data
+    csv_writer(df, name=name, status='_src')
     # fill na values with 0 for counters
     df.loc[:, 'In':'Out'] = df.loc[:, 'In':'Out'].fillna(0)
     # set data types
@@ -39,7 +43,7 @@ def bus_reader(df):
                     'Out': 'int'})
     df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%Y-%m-%dT%H:%M:%S')
     # rename the date (make it consistent with the other traffic data)
-    df = df.rename(columns={"Timestamp": "DATUM"})
+    df = df.rename(columns={'Timestamp': 'DATUM'})
     # mask for rows newer than ... and only select those rows
     mask = df['DATUM'] >= '2021-04-17'
     df = df.loc[mask, 'In':'DATUM']
@@ -52,14 +56,16 @@ def bus_reader(df):
     return df
 
 
-def car_reader(df):
+def car_reader(df, name=''):
+    # write .csv with original data
+    csv_writer(df, name=name, status='_src')
     # fill na values with 0 for counters
     df['AnzFahrzeuge'] = df['AnzFahrzeuge'].fillna(0)
     # set data types
     df = df.astype({'AnzFahrzeuge': 'int'})
     df['MessungDatZeit'] = pd.to_datetime(df['MessungDatZeit'], format='%Y-%m-%dT%H:%M:%S')
     # rename the counter and date (make it consistent with the other traffic data)
-    df = df.rename(columns={"AnzFahrzeuge": "CAR_TOT", "MessungDatZeit": "DATUM"})
+    df = df.rename(columns={'AnzFahrzeuge': 'CAR_TOT', 'MessungDatZeit': 'DATUM'})
     # mask for rows newer than ... and only select those rows
     mask = df['DATUM'] >= '2021-04-17'
     df = df.loc[mask, ['DATUM', 'CAR_TOT']]
@@ -68,12 +74,12 @@ def car_reader(df):
     return df
 
 
-def csv_writer(df, name=''):
+def csv_writer(df, name='', status=''):
     # write data into .csv file
     # get time today in format YYYY:MM:DD HH:MM:SS
-    today = str(datetime.now()).rsplit(".")[0]
+    today = str(datetime.now()).rsplit('.')[0]
     # define file name
-    filename = PATH + "download/" + name + '_' + today.rsplit(' ')[0] + ".csv"
+    filename = PATH + 'download/' + name + '_' + today.rsplit(' ')[0] + status + '.csv'
     # write data with pandas
     df.to_csv(filename, header=True, index=True)
 
@@ -94,9 +100,10 @@ data_dir = {'bicycle':
             }
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # create folder 'scraped' if not jet existing
     Path(PATH + '/download').mkdir(parents=True, exist_ok=True)
     # download data, main
     for i in data_dir:
-        csv_writer(data_dir[i][0](pd.read_csv(data_dir[i][1])), i)
+        # write cleaned .csv in the following line, dirty .csv is written within called function
+        csv_writer(data_dir[i][0](pd.read_csv(data_dir[i][1]), i), name=i, status='_stage')

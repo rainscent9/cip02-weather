@@ -24,14 +24,12 @@
 # - Wind:     5 day forecast, 1 hour resolution, from meteotest.ch
 #
 # OUTPUT (in folder scraped):
-# - Daily files:
-#     - meteotest_wind_DATE.csv
-#     - meteotest_weather_DATE.csv
-#     - meteotest_clean_DATE.csv
-# - Combined values over (following files will be appended forever)
-#     - meteotest_combined_clean.csv (USE THIS FILE FOR FURTHER PROCESSING)
-#     - meteotest_combined_weather.csv
-#     - meteotest_combined_wind.csv
+# - meteotest_scraper.log
+# - folder scraped:
+#   - meteotest_stage.csv (USE THIS FILE FOR FURTHER PROCESSING)
+#   - meteotest_wind_5day_forecast_hourly_src.csv
+#   - meteotest_weather_5day_forecast_daily_src.csv
+
 
 from datetime import datetime
 from datetime import timedelta
@@ -94,6 +92,7 @@ def scraper_weather():
         return None
     # iterate over all locations
     for location in LOCATIONS:
+        # ------------------------------------------------------------------------------------------------------
         # WIND FORECAST HOURLY
         # open webpage - wind
         driver.get(WEBPAGE_WIND + location)
@@ -132,8 +131,9 @@ def scraper_weather():
                 forecast = wind.find_elements_by_css_selector('.weatherPanelHalf > .stundenPrognoseRow')
                 # remove second header (from table of second half of the day)
                 del forecast[13]
-                # ignore first header ()
+                # ignore first header
                 for d in forecast[1:]:
+                    # extract data from element
                     data = {'date_scraped': str(datetime.now()).rsplit('.')[0],
                             'website_scraped': 'meteotest',
                             'date_forecast': str(datetime.now() + timedelta(days=day)).rsplit(' ')[0],
@@ -156,7 +156,9 @@ def scraper_weather():
                                 ' Exception wind page extracting (element not found) for location: ' + location)
         # sleep for a random amount of time
         time.sleep(random.randint(1, 3))
+        # ------------------------------------------------------------------------------------------------------
 
+        # ------------------------------------------------------------------------------------------------------
         # WEATHER FORECAST DAILY
         # open webpage
         driver.get(WEBPAGE_WEATHER + location)
@@ -195,6 +197,7 @@ def scraper_weather():
 
                 # store dataframe into pandas dataframe
                 df_weather_data = df_weather_data.append(data, ignore_index=True)
+        # ------------------------------------------------------------------------------------------------------
 
         except NoSuchElementException:
             logging.warning(
@@ -204,13 +207,16 @@ def scraper_weather():
         time.sleep(random.randint(1, 3))
     # close Chrome window
     driver.quit()
-    # Data wrangling: wind forecast df
+    # store dirty data in .csv
+    writer(df_wind_data, info='wind_5day_forecast_hourly', status='_src')
+    writer(df_weather_data, info='weather_5day_forecast_daily', status='_src')
+    # data cleaning: wind forecast df
     df_wind_data = clean_wind(df=df_wind_data)
-    # Data wrangling: weather forecast df
+    # data cleaning: weather forecast df
     df_weather_data = clean_weather(df=df_weather_data)
     # merge df with weather and wind
     df_weather_data = pd.merge(df_weather_data, df_wind_data, how='left', on=['location', 'date_forecast'])
-    # return merged df with weather and wind
+    # return cleaned, merged df with weather and wind
     return df_weather_data
 
 
@@ -273,15 +279,17 @@ def clean_weather(df):
     return df
 
 
-def writer(df, info='no_info', path=''):
-    # get time today in format YYYY:MM:DD HH:MM:SS
-    today = str(datetime.now()).rsplit('.')[0]
+def writer(df, info='no_info', status='', path=''):
     # define file name
-    filename = path + 'scraped/meteotest_' + info + '_' + today.rsplit(' ')[0] + '.csv'
-    filename_combined = path + 'scraped/meteotest_combined_' + info + '.csv'
-    # write data with pandas
-    df.to_csv(filename, header=True, index=False)
-    df.to_csv(filename_combined, mode='a', header=False, index=False)
+    filename_combined = path + 'scraped/meteotest_' + info + status + '.csv'
+    # write data
+    my_file = Path(filename_combined)
+    if my_file.is_file():
+        # file exists
+        df.to_csv(filename_combined, mode='a', header=False, index=False)  # write data with header
+    else:
+        # file doesn't exists
+        df.to_csv(filename_combined, mode='a', header=True, index=False)  # write data without header
 
 
 if __name__ == '__main__':
@@ -292,8 +300,8 @@ if __name__ == '__main__':
         # scrape every day at 11:00 am
         if (datetime.now().hour == 11) and (datetime.now().minute == 0):
             df_forecast = scraper_weather()
-            writer(df_forecast, info='clean', path=PATH)
+            writer(df_forecast, info='stage', path=PATH)
         time.sleep(30)
     # execute this once when simulation active:
     df_forecast = scraper_weather()
-    writer(df_forecast, info='clean', path=PATH)
+    writer(df_forecast, info='stage', path=PATH)
